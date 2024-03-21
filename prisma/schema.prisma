@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(uuid())
+  updateAt DateTime @updatedAt
+  createAt DateTime @default(now())
+
+  username String @unique
+  password String
+
+  sendChats       Message[] @relation("SendChats")
+  receiveredChats Message[] @relation("ReceivedChats")
+
+  chats  Chat?   @relation(fields: [chatId], references: [id])
+  chatId String?
+
+  @@index([username])
+}
+
+model Message {
+  id       String   @id @default(uuid())
+  updateAt DateTime @updatedAt
+  createAt DateTime @default(now())
+
+  sender   User   @relation("SendChats", fields: [senderId], references: [id])
+  senderId String
+
+  receiver   User   @relation("ReceivedChats", fields: [receiverId], references: [id])
+  receiverId String
+
+  chats  Chat?   @relation(fields: [chatId], references: [id])
+  chatId String?
+
+  text String
+}
+
+model Chat {
+  id       String   @id @default(uuid())
+  updateAt DateTime @updatedAt
+  createAt DateTime @default(now())
+
+  users    User[]
+  messages Message[]
+}
