@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import path from "path";
 
+import messageRouter from "./routes/messageRoute";
 import userRouter from "./routes/userRoute";
 
 const app = express();
@@ -13,6 +14,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.resolve("public/index.html"));
 });
 
+app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/users", userRouter);
 
 /**
