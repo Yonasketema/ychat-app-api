@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,9 +17,6 @@ model User {
 
   sendChats       Message[] @relation("SendChats")
   receiveredChats Message[] @relation("ReceivedChats")
-
-  chats  Chat?   @relation(fields: [chatId], references: [id])
-  chatId String?
 
   @@index([username])
 }
@@ -35,9 +32,6 @@ model Message {
   receiver   User   @relation("ReceivedChats", fields: [receiverId], references: [id])
   receiverId String
 
-  chats  Chat?   @relation(fields: [chatId], references: [id])
-  chatId String?
-
   text String
 }
 
@@ -46,6 +40,6 @@ model Chat {
   updateAt DateTime @updatedAt
   createAt DateTime @default(now())
 
-  users    User[]
-  messages Message[]
+  users    String[]
+  messages String[]
 }
