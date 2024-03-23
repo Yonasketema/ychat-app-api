@@ -3,4 +3,5 @@ export default {
   port: 8080,
   dbUrl: process.env.DATABASE_URL_DEV,
   jwt_secret: process.env.JWT_SECRET_KEY_DEV,
+  jwt_expireIn: process.env.EXPIRE_IN_DEV || "90d",
 };
