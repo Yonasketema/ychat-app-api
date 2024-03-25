@@ -33,6 +33,8 @@ model Message {
   receiverId String
 
   text String
+
+  @@index([senderId, receiverId])
 }
 
 model Chat {
