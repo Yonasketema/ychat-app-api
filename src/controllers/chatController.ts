@@ -1,18 +1,8 @@
 import db from "../db";
-import { Request, Response, NextFunction } from "express";
 
-const senderId = "cef42dca-1c93-4b07-bac9-3921d32bed09"; //req.user.id;
-
-interface MessageBody {
-  text: string;
-  receiverId: string;
-}
-
-export const createMessage = async (
-  req: Request<any, {}, MessageBody>,
-  res: Response
-) => {
+export const createMessage = async (req, res) => {
   const { receiverId, text } = req.body;
+  const senderId = req.user.id;
 
   let chat = await db.chat.findFirst({
     where: {
@@ -57,7 +47,9 @@ export const createMessage = async (
   });
 };
 
-export const getMessages = async (req: Request, res: Response) => {
+export const getMessages = async (req, res) => {
+  const senderId = req.user.id;
+
   const receiverId = req.params.id;
 
   const chat = await db.chat.findFirst({
@@ -79,7 +71,7 @@ export const getMessages = async (req: Request, res: Response) => {
     },
   });
 
-  res.status(201).json({
+  res.status(200).json({
     status: "success",
     data: messages,
   });
