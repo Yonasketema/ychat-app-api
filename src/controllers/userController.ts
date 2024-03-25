@@ -14,3 +14,18 @@ export const getAllUser = async (req, res) => {
     data: users,
   });
 };
+
+export const getUser = async (req, res) => {
+  const user = await db.user.findMany({
+    where: {
+      username: {
+        contains: req.params.username,
+      },
+    },
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+};
