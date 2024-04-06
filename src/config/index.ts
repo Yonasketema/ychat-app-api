@@ -1,11 +1,12 @@
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
 
 type EnvConfig = {
-  env: string;
+  env: "production" | "development";
   port: number;
   dbUrl: string;
   jwt_secret: string;
   jwt_expireIn: string;
+  cookie_name: string;
 };
 
 let envConfig: EnvConfig;
