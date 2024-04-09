@@ -50,7 +50,7 @@ export const createMessage = async (req, res) => {
 export const getMessages = async (req, res) => {
   const senderId = req.user.id;
 
-  const receiverId = req.params.id;
+  const receiverId = req.params.userId;
 
   const chat = await db.chat.findFirst({
     where: {
@@ -62,6 +62,13 @@ export const getMessages = async (req, res) => {
       messages: true,
     },
   });
+
+  if (!chat) {
+    return res.status(200).json({
+      status: "success",
+      data: null,
+    });
+  }
 
   const messages = await db.message.findMany({
     where: {
