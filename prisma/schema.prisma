@@ -26,10 +26,10 @@ model Message {
   updateAt DateTime @updatedAt
   createAt DateTime @default(now())
 
-  sender   User   @relation("SendChats", fields: [senderId], references: [id])
+  sender   User   @relation("SendChats", fields: [senderId], references: [id], onDelete: Cascade)
   senderId String
 
-  receiver   User   @relation("ReceivedChats", fields: [receiverId], references: [id])
+  receiver   User   @relation("ReceivedChats", fields: [receiverId], references: [id], onDelete: Cascade)
   receiverId String
 
   text String
