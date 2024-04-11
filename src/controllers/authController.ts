@@ -1,37 +1,54 @@
 import { Request, Response, NextFunction } from "express";
+import { serialize } from "cookie";
 import jwt from "jsonwebtoken";
-import { hashPassword, verifyPassword } from "../lib/auth";
+
 import { createJWT } from "../lib/jwt";
 import db from "../db";
 import config from "../config";
 
+import { hashPassword, verifyPassword } from "../lib/auth";
 interface SignupBody {
   username: string;
   password: string;
 }
 
-export const signup = async (
-  req: Request<any, {}, SignupBody>,
-  res: Response
-) => {
+export const signup = async (req: Request, res: Response, next) => {
   const { username, password } = req.body;
 
-  const user = await db.user.create({
-    data: {
-      username,
-      password: await hashPassword(password),
-    },
-  });
+  try {
+    if (!username || !password) {
+      throw Error("provide email and password");
+    }
 
-  const token = createJWT(user);
+    const user = await db.user.create({
+      data: {
+        username,
+        password: await hashPassword(password),
+      },
+    });
 
-  res.status(201).json({
-    status: "success",
-    token,
-  });
+    const token = createJWT(user);
+
+    res.setHeader(
+      "Set-Cookie",
+      serialize(config.cookie_name, token, {
+        httpOnly: true,
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      })
+    );
+
+    res.status(201);
+    res.json({});
+  } catch (err) {
+    res.status(401).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
 };
 
-export const login = async (req, res, next) => {
+export const login = async (req, res: Response, next) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -50,25 +67,27 @@ export const login = async (req, res, next) => {
 
   const token = createJWT(user);
 
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  res.setHeader(
+    "Set-Cookie",
+    serialize(config.cookie_name, token, {
+      httpOnly: true,
+      path: "/",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    })
+  );
+
+  res.status(201);
+  res.json({});
 };
 
 export const protect = async (req, res, next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  }
+  let token = req.cookies[config.cookie_name];
+
   if (!token) {
     return next(new Error("unauthorization"));
   }
 
-  const user = jwt.verify(token, config.jwt_secret);
+  const user = await jwt.verify(token, config.jwt_secret);
 
   const sign_user = await db.user.findUnique({
     where: {
@@ -80,7 +99,7 @@ export const protect = async (req, res, next) => {
     return next(new Error("The user does not exist"));
   }
 
-  req.user = user;
+  req.user = sign_user;
 
   /// Access to protected route
   next();
