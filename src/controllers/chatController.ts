@@ -1,8 +1,9 @@
 import db from "../db";
 
 export const createMessage = async (req, res) => {
-  const { receiverId, text } = req.body;
+  const { text } = req.body;
   const senderId = req.user.id;
+  const receiverId = req.params.receiverId;
 
   let chat = await db.chat.findFirst({
     where: {
