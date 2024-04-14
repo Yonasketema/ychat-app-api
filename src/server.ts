@@ -1,9 +1,9 @@
 import "dotenv/config";
 
 import config from "./config";
-import app from "./app";
+import { server } from "./socket";
 
 const PORT = config.port;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`> Server Running on http://localhost:${PORT} ...`);
 });

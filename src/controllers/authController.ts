@@ -39,7 +39,10 @@ export const signup = async (req: Request, res: Response, next) => {
     );
 
     res.status(201);
-    res.json({});
+    res.json({
+      status: "success",
+      data: user,
+    });
   } catch (err) {
     res.status(401).json({
       status: "fail",
@@ -77,7 +80,10 @@ export const login = async (req, res: Response, next) => {
   );
 
   res.status(201);
-  res.json({});
+  res.json({
+    status: "success",
+    data: user,
+  });
 };
 
 export const protect = async (req, res, next) => {
