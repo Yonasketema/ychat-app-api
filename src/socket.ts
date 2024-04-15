@@ -11,6 +11,11 @@ const io = new Server(server, {
   },
 });
 const onlineUsers = {};
+
+export const getReceiverSocketId = (receiverId) => {
+  return onlineUsers[receiverId];
+};
+
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string; ////????
 
@@ -25,4 +30,5 @@ io.on("connection", (socket) => {
     io.emit("onlineUsers", Object.keys(onlineUsers));
   });
 });
+
 export { io, server };

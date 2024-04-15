@@ -1,4 +1,5 @@
 import db from "../db";
+import { getReceiverSocketId, io } from "../socket";
 
 export const createMessage = async (req, res) => {
   const { text } = req.body;
@@ -40,6 +41,11 @@ export const createMessage = async (req, res) => {
         },
       },
     });
+  }
+
+  const receiverSocketId = getReceiverSocketId(receiverId);
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("newMessage", message);
   }
 
   res.status(201).json({
