@@ -11,6 +11,7 @@ export const getAllUser = async (req, res) => {
 
   res.status(200).json({
     status: "success",
+    cache_data: false,
     data: users,
   });
 };
@@ -26,6 +27,7 @@ export const getUser = async (req, res) => {
 
   res.status(200).json({
     status: "success",
+    cache_data: false,
     data: user,
   });
 };

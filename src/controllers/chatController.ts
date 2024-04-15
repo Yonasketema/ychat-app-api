@@ -1,4 +1,5 @@
 import db from "../db";
+import client from "../lib/redis";
 import { getReceiverSocketId, io } from "../socket";
 
 export const createMessage = async (req, res) => {
@@ -48,8 +49,11 @@ export const createMessage = async (req, res) => {
     io.to(receiverSocketId).emit("newMessage", message);
   }
 
+  await client.hDel(senderId, receiverId);
+
   res.status(201).json({
     status: "success",
+    cache_data: false,
     data: message,
   });
 };
@@ -58,6 +62,16 @@ export const getMessages = async (req, res) => {
   const senderId = req.user.id;
 
   const receiverId = req.params.userId;
+
+  const redis_chat = await client.hGet(senderId, receiverId);
+
+  if (redis_chat) {
+    return res.status(200).json({
+      status: "success",
+      cache_data: true,
+      data: JSON.parse(redis_chat),
+    });
+  }
 
   const chat = await db.chat.findFirst({
     where: {
@@ -85,8 +99,11 @@ export const getMessages = async (req, res) => {
     },
   });
 
+  await client.hSet(senderId, receiverId, JSON.stringify(messages));
+
   res.status(200).json({
     status: "success",
+    cache_data: false,
     data: messages,
   });
 };
